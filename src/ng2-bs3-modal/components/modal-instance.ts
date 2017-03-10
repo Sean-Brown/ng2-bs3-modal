@@ -10,10 +10,12 @@ export class ModalInstance {
     private suffix: string = '.ng2-bs3-modal';
     private shownEventName: string = 'shown.bs.modal' + this.suffix;
     private hiddenEventName: string = 'hidden.bs.modal' + this.suffix;
+    private hideEventName: string = 'hide.bs.modal' + this.suffix;
     private $modal: any;
 
     shown: Observable<void>;
     hidden: Observable<ModalResult>;
+    hide: Observable<any>;
     result: any;
     visible: boolean = false;
 
@@ -27,16 +29,16 @@ export class ModalInstance {
 
     close(): Promise<any> {
         this.result = ModalResult.Close;
-        return this.hide();
+        return this.hideModal();
     }
 
     dismiss(): Promise<any> {
         this.result = ModalResult.Dismiss;
-        return this.hide();
+        return this.hideModal();
     }
 
     destroy(): Promise<any> {
-        return this.hide().then(() => {
+        return this.hideModal().then(() => {
             if (this.$modal) {
                 this.$modal.data('bs.modal', null);
                 this.$modal.remove();
@@ -51,7 +53,7 @@ export class ModalInstance {
         return promise;
     }
 
-    private hide(): Promise<ModalResult> {
+    private hideModal(): Promise<ModalResult> {
         if (this.$modal && this.visible) {
             let promise = toPromise(this.hidden);
             this.$modal.modal('hide');
@@ -79,6 +81,8 @@ export class ModalInstance {
 
                 return result;
             });
+
+        this.hide = Observable.fromEvent(this.$modal, this.hideEventName);
     }
 
     private resetData() {

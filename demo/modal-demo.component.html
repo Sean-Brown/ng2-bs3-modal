@@ -28,6 +28,8 @@
         <button type="button" class="btn btn-default" (click)="open()">Open from parent component</button>
         <button type="button" class="btn btn-default" (click)="parentModal.open()">Nested modals</button>
         <button type="button" class="btn btn-default" (click)="validationModal.open()">With form validation</button>
+        <button type="button" class="btn btn-default" (click)="alertAlwaysModel.open()">Alert on dismiss</button>
+        <button type="button" class="btn btn-default" (click)="alertConditionalModel.open()">Alternating alert on dismiss</button>
     </p>
     <br />
 
@@ -97,6 +99,36 @@
             <modal-footer>
                 <button type="button" class="btn btn-default" data-dismiss="modal" (click)="validationModal.dismiss()">Cancel</button>
                 <button type="button" class="btn btn-primary" [disabled]="!modalForm.valid" (click)="validationModal.close()">Save</button>
+            </modal-footer>
+        </form>
+    </modal>
+
+    <modal [animation]="animation" [keyboard]="keyboard" [backdrop]="backdrop" (onClose)="closed()" (onDismiss)="dismissed()"
+        (onOpen)="opened()" [cssClass]="cssClass" [hideCondition]="true" [hideAlertText]="'are you sure you want to leave?'" #alertAlwaysModel>
+        <form #modalForm="ngForm">
+            <modal-header [show-close]="true">
+                <h4 class="modal-title">I'm a modal!</h4>
+            </modal-header>
+            <modal-body>
+                <p>An alert will be fired when you try to dismiss this dialog.</p>
+            </modal-body>
+            <modal-footer>
+                <button type="button" class="btn btn-default" data-dismiss="modal" (click)="alertAlwaysModel.dismiss()">Dismiss</button>
+            </modal-footer>
+        </form>
+    </modal>
+
+    <modal [animation]="animation" [keyboard]="keyboard" [backdrop]="backdrop" (onClose)="closed()" (onDismiss)="dismissed()"
+        (onOpen)="opened()" [cssClass]="cssClass" [hideCondition]="shouldAlert" [hideAlertText]="'are you positive you want to leave?'" #alertConditionalModel>
+        <form #modalForm="ngForm">
+            <modal-header [show-close]="true">
+                <h4 class="modal-title">I'm a modal!</h4>
+            </modal-header>
+            <modal-body>
+                <p>An alert will be fired when you try to dismiss this dialog.</p>
+            </modal-body>
+            <modal-footer>
+                <button type="button" class="btn btn-default" data-dismiss="modal" (click)="alertConditionalModel.dismiss()">Dismiss</button>
             </modal-footer>
         </form>
     </modal>

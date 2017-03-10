@@ -28,6 +28,8 @@ export class ModalComponent implements OnDestroy {
     @Input() keyboard: boolean = true;
     @Input() size: string;
     @Input() cssClass: string = '';
+    @Input() hideCondition: boolean | Function = false;
+    @Input() hideAlertText: string = '';
 
     @Output() onClose: EventEmitter<any> = new EventEmitter(false);
     @Output() onDismiss: EventEmitter<any> = new EventEmitter(false);
@@ -57,6 +59,19 @@ export class ModalComponent implements OnDestroy {
 
         this.instance.shown.subscribe(() => {
             this.onOpen.emit(undefined);
+        });
+
+        this.instance.hide.subscribe((event) => {
+            const shouldShowPopup = (
+                (typeof this.hideCondition === "boolean") ? this.hideCondition :
+                (typeof this.hideCondition === "function") ? this.hideCondition() :
+                false
+                );
+            if (shouldShowPopup && !confirm(this.hideAlertText)) {
+                event.preventDefault();
+                event.stopImmediatePropagation;
+                return false;
+            }
         });
     }
 

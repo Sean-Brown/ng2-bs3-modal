@@ -26,6 +26,7 @@ export class ModalDemoComponent {
     selected: string;
     output: string;
     model: Person = new Person();
+    _shouldAlert: boolean = false;
 
     index: number = 0;
     backdropOptions = [true, false, 'static'];
@@ -37,6 +38,12 @@ export class ModalDemoComponent {
     css: boolean = false;
 
     constructor(private router: Router) { }
+
+    shouldAlert() {
+        const shouldAlert = this._shouldAlert;
+        this._shouldAlert = !this._shouldAlert;
+        return shouldAlert;
+    }
 
     closed() {
         this.output = '(closed) ' + this.selected;
