@@ -46,6 +46,10 @@ export class ModalInstance {
         });
     }
 
+    removeBackdrop() {
+        jQuery(".modal-backdrop").remove();
+    }
+
     private show() {
         let promise = toPromise(this.shown);
         this.resetData();

@@ -103,8 +103,7 @@
         </form>
     </modal>
 
-    <modal [animation]="animation" [keyboard]="keyboard" [backdrop]="backdrop" (onClose)="closed()" (onDismiss)="dismissed()"
-        (onOpen)="opened()" [cssClass]="cssClass" [hideCondition]="true" [hideAlertText]="'are you sure you want to leave?'" #alertAlwaysModel>
+    <modal [animation]="animation" [keyboard]="keyboard" [backdrop]="backdrop" (onOpen)="opened()" [cssClass]="cssClass" [hideCondition]="true" [hideAlertText]="'are you sure you want to leave?'" #alertAlwaysModel>
         <form #modalForm="ngForm">
             <modal-header [show-close]="true">
                 <h4 class="modal-title">I'm a modal!</h4>
@@ -118,7 +117,7 @@
         </form>
     </modal>
 
-    <modal [animation]="animation" [keyboard]="keyboard" [backdrop]="backdrop" (onClose)="closed()" (onDismiss)="dismissed()"
+    <modal [animation]="animation" [keyboard]="keyboard" [backdrop]="backdrop"
         (onOpen)="opened()" [cssClass]="cssClass" [hideCondition]="shouldAlert" [hideAlertText]="'are you positive you want to leave?'" #alertConditionalModel>
         <form #modalForm="ngForm">
             <modal-header [show-close]="true">

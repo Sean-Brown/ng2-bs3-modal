@@ -1,4 +1,4 @@
-import { Component, OnDestroy, Input, Output, EventEmitter, Type, ElementRef, HostBinding, Inject } from '@angular/core';
+import { Component, OnDestroy, Input, Output, EventEmitter, Type, ElementRef, HostBinding, Inject, ViewChild, AfterViewInit } from '@angular/core';
 import { ModalInstance, ModalResult } from './modal-instance';
 
 @Component({
@@ -14,14 +14,33 @@ import { ModalInstance, ModalResult } from './modal-instance';
                 <ng-content></ng-content>
             </div>
         </div>
+        <div class="modal fade" #alertPopup>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{ hideAlertHeader }}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>{{ hideAlertText }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" (click)="alertPopupInstance.dismiss()">{{ hideAlertDismissBtnText }}</button>
+                        <button type="button" class="btn btn-danger" (click)="alertPopupInstance.close()">{{ hideAlertCloseBtnText }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     `
 })
-export class ModalComponent implements OnDestroy {
+export class ModalComponent implements AfterViewInit, OnDestroy {
 
     private overrideSize: string = null;
 
     instance: ModalInstance;
+    alertPopupInstance: ModalInstance;
     visible: boolean = false;
+
+    @ViewChild('alertPopup') alertPopup: ElementRef;
 
     @Input() animation: boolean = true;
     @Input() backdrop: string | boolean = true;
@@ -29,7 +48,10 @@ export class ModalComponent implements OnDestroy {
     @Input() size: string;
     @Input() cssClass: string = '';
     @Input() hideCondition: boolean | Function = false;
-    @Input() hideAlertText: string = '';
+    @Input() hideAlertHeader: string = 'Wait!';
+    @Input() hideAlertText: string = 'Are you sure?';
+    @Input() hideAlertDismissBtnText = 'No';
+    @Input() hideAlertCloseBtnText = 'Yes';
 
     @Output() onClose: EventEmitter<any> = new EventEmitter(false);
     @Output() onDismiss: EventEmitter<any> = new EventEmitter(false);
@@ -47,7 +69,7 @@ export class ModalComponent implements OnDestroy {
         return this.backdrop;
     }
 
-    constructor(private element: ElementRef) {
+    constructor(protected element: ElementRef) {
         this.instance = new ModalInstance(this.element);
 
         this.instance.hidden.subscribe((result) => {
@@ -63,14 +85,30 @@ export class ModalComponent implements OnDestroy {
 
         this.instance.hide.subscribe((event) => {
             const shouldShowPopup = (
-                (typeof this.hideCondition === "boolean") ? this.hideCondition :
-                (typeof this.hideCondition === "function") ? this.hideCondition() :
+                (typeof this.hideCondition === 'boolean') ? this.hideCondition :
+                (typeof this.hideCondition === 'function') ? this.hideCondition() :
                 false
                 );
-            if (shouldShowPopup && !confirm(this.hideAlertText)) {
+            if (shouldShowPopup && this.alertPopupInstance.result !== ModalResult.Close) {
                 event.preventDefault();
                 event.stopImmediatePropagation;
+                this.alertPopupInstance.open();
                 return false;
+            }
+            else if (this.alertPopupInstance.result === ModalResult.Close) {
+                this.alertPopupInstance.result = ModalResult.None;
+            }
+        });
+    }
+
+    ngAfterViewInit() {
+        this.alertPopupInstance = new ModalInstance(this.alertPopup);
+
+        this.alertPopupInstance.hidden.subscribe((result) => {
+            this.alertPopupInstance.result = result;
+            if (result === ModalResult.Close) {
+                this.close();
+                this.instance.removeBackdrop();
             }
         });
     }
