@@ -19,7 +19,12 @@ export class ModalInstance {
     result: any;
     visible: boolean = false;
 
-    constructor(private element: ElementRef) {
+    constructor(private element: ElementRef, extraEventSuffix: string = '') {
+        if (extraEventSuffix && extraEventSuffix.length > 0) {
+            this.shownEventName += extraEventSuffix;
+            this.hiddenEventName += extraEventSuffix;
+            this.hideEventName += extraEventSuffix;
+        }
         this.init();
     }
 

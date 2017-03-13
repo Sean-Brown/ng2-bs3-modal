@@ -39,6 +39,7 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
     instance: ModalInstance;
     alertPopupInstance: ModalInstance;
     visible: boolean = false;
+    isAlerting: boolean = false;
 
     @ViewChild('alertPopup') alertPopup: ElementRef;
 
@@ -84,6 +85,13 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
         });
 
         this.instance.hide.subscribe((event) => {
+            if (this.isAlerting) {
+                // for some reason displaying the alert pop-up causes another 'hide' event to be triggered
+                // in this case, just short-circuit the event
+                event.preventDefault();
+                event.stopImmediatePropagation;
+                return false;
+            }
             const shouldShowPopup = (
                 (typeof this.hideCondition === 'boolean') ? this.hideCondition :
                 (typeof this.hideCondition === 'function') ? this.hideCondition() :
@@ -93,18 +101,23 @@ export class ModalComponent implements AfterViewInit, OnDestroy {
                 event.preventDefault();
                 event.stopImmediatePropagation;
                 this.alertPopupInstance.open();
+                this.isAlerting = true;
                 return false;
             }
-            else if (this.alertPopupInstance.result === ModalResult.Close) {
-                this.alertPopupInstance.result = ModalResult.None;
+            else {
+                this.isAlerting = false;
+                if (this.alertPopupInstance.result === ModalResult.Close) {
+                    this.alertPopupInstance.result = ModalResult.None;
+                }
             }
         });
     }
 
     ngAfterViewInit() {
-        this.alertPopupInstance = new ModalInstance(this.alertPopup);
+        this.alertPopupInstance = new ModalInstance(this.alertPopup, '.alert-popup');
 
         this.alertPopupInstance.hidden.subscribe((result) => {
+            this.isAlerting = false;
             this.alertPopupInstance.result = result;
             if (result === ModalResult.Close) {
                 this.close();
